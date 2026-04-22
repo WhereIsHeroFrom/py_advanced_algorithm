@@ -1,5 +1,9 @@
+##############LIS模板##############
+# a[i]  < g[mid] 时，求不降
+# a[i] <= g[mid] 时，求递增
 def getLIS(n, a, dp):
-    # g[i] 代表长度为 i 的最长递增子序列的最后一个数是什么
+    # g[i] 代表长度为 i 的
+    # 最长递增子序列的最后一个数是什么
     g = []
     gSize = 0
     for i in range(n):
@@ -20,6 +24,7 @@ def getLIS(n, a, dp):
             g[r] = a[i]
         dp[i] = gSize
     return gSize
+##############LIS模板##############
 
 n = int(input())
 a = list(map(int, input().split()))
