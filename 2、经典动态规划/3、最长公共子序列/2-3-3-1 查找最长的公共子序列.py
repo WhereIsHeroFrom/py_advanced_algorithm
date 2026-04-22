@@ -1,16 +1,21 @@
+###################LCS模板###################
 def getLCS(n, a, m, b, dp, path):
+    # dp[i][j] 代表 a[1:i] 和 b[1:j] 
+    # 这两个数组的最长公共子序列的长度
     for i in range(1, n+1):
         for j in range(1, m+1):
             if a[i] == b[j]:
                 dp[i][j] = dp[i-1][j-1] + 1
                 path[i][j] = 0
             elif dp[i-1][j] > dp[i][j-1]:
-                dp[i][j] = 0
+                dp[i][j] = dp[i-1][j]
                 path[i][j] = 1
             else:
-                dp[i][j] = 0
+                dp[i][j] = dp[i][j-1]
                 path[i][j] = 2
     return dp[n][m]
+###################LCS模板###################
+
 
 def constructLCS(x, a, y, b, path, ans):
     i, j = x, y
@@ -27,23 +32,21 @@ def constructLCS(x, a, y, b, path, ans):
             j -= 1
     ans.reverse()
 
-a = input().strip()
-b = input().strip()
+### 数据输入
+a = input()
+b = input()
+n, m = len(a), len(b)
 
-n = len(a)
-m = len(b)
-
-# 调整数组索引，使其从1开始
+### 数据处理
 a = [''] + list(a)
 b = [''] + list(b)
+dp = [[0]*(m + 1) for _ in range(n + 1)]
+path = [[0]*(m + 1) for _ in range(n + 1)]
 
-maxn = 1010
-maxm = 1010
-dp = [[0]*(maxm) for _ in range(maxn)]
-path = [[0]*(maxm) for _ in range(maxn)]
-
+### 算法过程
 getLCS(n, a, m, b, dp, path)
 
+### 数据处理
 x, y = 1, 1
 for i in range(1, n+1):
     for j in range(1, m+1):
@@ -53,5 +56,4 @@ for i in range(1, n+1):
 
 ans = []
 constructLCS(x, a, y, b, path, ans)
-
 print(''.join(ans))

@@ -1,5 +1,7 @@
+###################LCS模板###################
 def getLCS(n, a, m, b, dp, path):
-    # dp[i][j] 代表 a[1:i] 和 b[1:j] 这两个数组的最长公共子序列的长度
+    # dp[i][j] 代表 a[1:i] 和 b[1:j] 
+    # 这两个数组的最长公共子序列的长度
     for i in range(1, n+1):
         for j in range(1, m+1):
             if a[i] == b[j]:
@@ -12,13 +14,14 @@ def getLCS(n, a, m, b, dp, path):
                 dp[i][j] = dp[i][j-1]
                 path[i][j] = 2
     return dp[n][m]
+###################LCS模板###################
 
+### 输入
+n, m = map(int, input().split())
 a = [0] + list(map(int, input().split()))
 b = [0] + list(map(int, input().split()))
-
-maxn = 1010
-maxm = 1010
-dp = [[0]*(maxm) for _ in range(maxn)]
-path = [[0]*(maxm) for _ in range(maxn)]
-
+### 数据结构
+dp = [[0]*(m + 1) for _ in range(n + 1)]
+path = [[0]*(m + 1) for _ in range(n + 1)]
+### 输出
 print(getLCS(n, a, m, b, dp, path))
