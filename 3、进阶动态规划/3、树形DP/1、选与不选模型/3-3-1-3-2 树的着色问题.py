@@ -1,10 +1,8 @@
-import sys
-from sys import stdin
-
 mod = 1000000007
-
-# dp[i][0] 代表以 i 为根节点的子树，且根节点不选的方案数
-# dp[i][1] 代表以 i 为根节点的子树，且根节点选的方案数
+#############################树形DP(选or不选)模板#############################
+inf = -1
+dp = []
+child = []
 
 def TreeDPSimple_InitVal(u, isChoose):
     return 1
@@ -15,12 +13,16 @@ def TreeDPSimple_Opt(curVal, isChoose, ncVal, cVal):
     return curVal * (ncVal + cVal) % mod
 
 def TreeDPSimple_Init(n):
-    global dp
-    dp = [[-1] * 2 for _ in range(n+1)]
+    for _ in range(n+1):
+        child.append([])
+        dp.append( [ inf ] * 2 )
+
+def TreeDPSimple_AddEdge(u, v):
+    child[u].append(v)
+    child[v].append(u)
 
 def TreeDPSimple_DFS(u, isChoose, fat):
-    global dp, child
-    if dp[u][isChoose] != -1:
+    if dp[u][isChoose] != inf:
         return dp[u][isChoose]
     dp[u][isChoose] = TreeDPSimple_InitVal(u, isChoose)
     for v in child[u]:
@@ -30,16 +32,15 @@ def TreeDPSimple_DFS(u, isChoose, fat):
         c = TreeDPSimple_DFS(v, True, u)
         dp[u][isChoose] = TreeDPSimple_Opt(dp[u][isChoose], isChoose, nc, c)
     return dp[u][isChoose]
+#############################树形DP(选or不选)模板#############################
 
-n = int(stdin.readline())
-child = [[] for _ in range(n+1)]
+
+n = int(input())
 TreeDPSimple_Init(n)
 
 for _ in range(n-1):
-    x, y = map(int, stdin.readline().split())
-    child[x].append(y)
-    child[y].append(x)
+    x, y = map(int, input().split())
+    TreeDPSimple_AddEdge(x, y)
 
 ans = (TreeDPSimple_DFS(1, 0, -1) + TreeDPSimple_DFS(1, 1, -1)) % mod
-
 print(ans)
