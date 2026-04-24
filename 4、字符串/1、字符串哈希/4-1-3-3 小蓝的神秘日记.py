@@ -1,4 +1,4 @@
-# 字符串hash模板
+######################字符串hash模板######################
 maxn = 1000010
 B = 271
 mod = 2 ** 64
@@ -18,11 +18,13 @@ def get(l, r):
         return Hash[r]
     return (Hash[r] - Hash[l-1] * Power[r - l + 1]) % mod
 
-def check(len_val):
+######################字符串hash模板######################
+
+def check(sublen):
     v = []
-    # 1、获取所有长度为 len_val 的子串的哈希值
-    for i in range(n - len_val + 1):
-        val = get(i, i + len_val - 1)
+    # 1、获取所有长度为 sublen 的子串的哈希值
+    for i in range(n - sublen + 1):
+        val = get(i, i + sublen - 1)
         v.append( (val, i) )
     # 2、把所有子串的哈希值相等的元素排在一起，并且位置按递增排序
     v.sort()
@@ -34,7 +36,7 @@ def check(len_val):
             if v[j][0] != v[i][0]:
                 i = j - 1
                 break
-            if v[j][1] - v[i][1] >= len_val:
+            if v[j][1] - v[i][1] >= sublen:
                 return True
             j += 1
         i += 1

@@ -1,4 +1,4 @@
-# 字符串hash模板
+######################字符串hash模板######################
 maxn = 1000010
 B = 271
 mod = 2 ** 64
@@ -18,30 +18,29 @@ def get(l, r):
         return Hash[r]
     return (Hash[r] - Hash[l-1] * Power[r - l + 1]) % mod
 
-s = input().strip()
+######################字符串hash模板######################
+
+def check(s, slen, sublen):
+    for j in range(slen - 2 * sublen + 1):
+        l = j
+        r = j + sublen - 1
+        v = get(l, r)
+        for k in range(r + 1, slen - sublen + 1):
+            if v == get(k, k + sublen - 1):
+                return True
+    return False
+
+s = input()
 n = len(s)
 init(s)
 
-# 1、逆序枚举满足条件的长度，如果发现有一个长度满足条件，直接跳出
 l = -1
 r = n // 2 + 1
-
 while l + 1 < r:
-    i = (l + r) // 2
-    check = False
-    for j in range(n - 2 * i + 1):
-        L = j
-        R = j + i - 1
-        v = get(L, R)
-        for k in range(R + 1, n - i + 1):
-            if v == get(k, k + i - 1):
-                check = True
-                break
-        if check:
-            break
-    if check:
-        l = i
+    mid = (l + r) // 2
+    if check(s, n, mid):
+        l = mid
     else:
-        r = i
+        r = mid
 
 print(l)
