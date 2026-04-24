@@ -1,28 +1,19 @@
-# 区间DP模板
+#########################区间DP模板#########################
 
-maxn = 210
-type = int
-
-n = 0
-dp = [[0 for _ in range(2 * maxn)] for _ in range(2 * maxn)]
-a = [0] * (2 * maxn)
-mul = [[0 for _ in range(2 * maxn)] for _ in range(2 * maxn)]
+maxn = 410
+inf  = 0
+init = 0
+dp = [[0] * (maxn) for _ in range(maxn)]
+a = [0] * maxn
+mul = [[0 for _ in range(maxn)] for _ in range(maxn)]
 
 # min、max、sum
-def IntervalDP_Opt(a_val, b_val):
-    return max(a_val, b_val)
-
-# 非法状态值
-def IntervalDP_ValueInf():
-    return 0
-
-# 初始状态值
-def IntervalDP_ValueInit():
-    return 0
+def IntervalDP_Opt(a, b):
+    return max(a, b)
 
 # 计算区间 [l, r] 的值
 def IntervalDP_CalcState(l, r):
-    ans = IntervalDP_ValueInf()
+    ans = inf
     for k in range(l, r):
         # dp[l][k] ... dp[k+1][r]
         a_val = mul[l][k]
@@ -33,7 +24,7 @@ def IntervalDP_CalcState(l, r):
 
 # 固定模板，一般情况不需要修改
 def IntervalDP_Solve(maxlen, maxr):
-    ans = IntervalDP_ValueInf()
+    ans = inf
     # 1、枚举区间长度
     for i in range(1, maxlen + 1):
         # 2、枚举区间起点
@@ -41,12 +32,16 @@ def IntervalDP_Solve(maxlen, maxr):
             l = j
             r = j + i - 1
             if i == 1:
-                dp[l][r] = IntervalDP_ValueInit()
+                dp[l][r] = init
             else:
                 dp[l][r] = IntervalDP_CalcState(l, r)
             if i == maxlen:
                 ans = IntervalDP_Opt(ans, dp[l][r])
     return ans
+
+#########################区间DP模板#########################
+
+
 
 # 主逻辑
 n = int(input())
