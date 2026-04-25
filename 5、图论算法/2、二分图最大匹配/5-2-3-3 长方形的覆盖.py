@@ -1,14 +1,10 @@
-# 长方形的覆盖 - 二分图最大匹配应用
-
+#######################二分图最大匹配(匈牙利算法)#######################
 class Hungarian:
     def __init__(self, n, m):
-        self.n = n  # 左部节点数
-        self.m = m  # 右部节点数
+        self.n = n                             # 左部节点数
+        self.m = m                             # 右部节点数
         self.adj = [[] for _ in range(n + 1)]  # 邻接表
-        self.pre = [-1] * (m + 1)  # 右部节点匹配的左部节点
-    
-    def addEdge(self, u, v):
-        self.adj[u].append(v)
+        self.pre = [-1] * (m + 1)              # 右部节点匹配的左部节点
     
     def findMatch(self, u, visit):
         for v in self.adj[u]:
@@ -20,20 +16,25 @@ class Hungarian:
                     return True
                 self.pre[v] = vpre
         return False
-    
-    def getMaxMatch(self):
+
+    def AddEdge(self, u, v):
+        self.adj[u].append(v)
+
+    def GetMaxMatch(self):
         cnt = 0
         for i in range(1, self.n + 1):
             visit = [False] * (self.m + 1)
             if self.findMatch(i, visit):
                 cnt += 1
         return cnt
+    
+#######################二分图最大匹配(匈牙利算法)#######################
 
 # 主逻辑
 n = int(input())
 c = []
 for _ in range(n):
-    line = input().strip()
+    line = input()
     c.append(line)
 m = n
 # 定义方向数组（上、右、下、左）
@@ -57,9 +58,9 @@ for i in range(n):
                 if 0 <= di < n and 0 <= dj < m:
                     if c[di][dj] == '0':  # 目标格子也是空白
                         v = di * m + dj + 1
-                        hungarian.addEdge(u, v)
+                        hungarian.AddEdge(u, v)
 
 # 计算最大匹配
-max_match = hungarian.getMaxMatch()
+max_match = hungarian.GetMaxMatch()
 # 每个长方形覆盖两个格子，所以结果是最大匹配的一半
 print(max_match//2)
