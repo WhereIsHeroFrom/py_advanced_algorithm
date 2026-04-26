@@ -1,4 +1,4 @@
-# 最小强连通边数 - 强连通分量应用
+######################强连通分量(Tarjan算法)######################
 
 class TarjanSCC:
     def __init__(self, n):
@@ -55,6 +55,10 @@ class TarjanSCC:
     
     def getSCCNodes(self, sccId):
         return self.sccNodes[sccId]
+    
+######################强连通分量(Tarjan算法)######################
+
+###########################缩图模板###############################
 
 class ShrinkGraph:
     def __init__(self):
@@ -102,6 +106,7 @@ class ShrinkGraph:
             if self.outd[i] == 0:
                 outdCount += 1
         return max(indCount, outdCount)
+###########################缩图模板###############################
 
 # 主逻辑
 t = int(input())

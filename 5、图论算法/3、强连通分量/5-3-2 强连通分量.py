@@ -1,4 +1,4 @@
-# 强连通分量 - Tarjan算法
+######################强连通分量(Tarjan算法)######################
 
 class TarjanSCC:
     def __init__(self, n):
@@ -55,6 +55,9 @@ class TarjanSCC:
     
     def getSCCNodes(self, sccId):
         return self.sccNodes[sccId]
+    
+######################强连通分量(Tarjan算法)######################
+
 
 # 主逻辑
 n, m = map(int, input().split())
