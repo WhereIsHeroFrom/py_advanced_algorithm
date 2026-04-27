@@ -1,101 +1,99 @@
-maxd = 65
+##########################################数位DP模板##########################################
+import sys
+sys.setrecursionlimit(1 << 16)
 
-try:
-    import sys
-    sys.setrecursionlimit(1000000)
-except:
-    pass
-
-# 一般情况下，1个参数居多，部分情况会有两个参数
-# 当需要3个参数的时候，就需要修改这个类了
 class DpData:
+    # 1、修改点，通过输入数据进行输入
     K = 0
-    base = 10  # 十进制
-    
+    # 2、修改点，通过题目进行修改，二进制是 2，十进制是 10，也有可能通过输入数据输入
+    base = 10
+    dp = {}
+
     def __init__(self):
-        self.data0 = 0  # 最后三个数位模上1000的值
-        self.data1 = 0  # 这个数是否满足条件
         self.init()
     
     def init(self):
-        self.data0 = 0
-        self.data1 = 0
-    
-    def dfsReturn(self, is_leadingZero):
-        if is_leadingZero:
-            # 0000000000
-            return 0
-        return self.data1
-    
-    def getNextDpData(self, is_leadingZero, digit):
-        ret = DpData()
-        ret.data0 = self.data0
-        ret.data1 = self.data1
-        
-        if ret.data0 == 202 and digit == 3:
-            ret.data1 = 1
-        if ret.data0 % 10 == 1 and digit == 4:
-            ret.data1 = 1
-        
-        ret.data0 = (ret.data0 * 10 + digit) % 1000
-        return ret
-
-# 初始化dp数组
-dp = [[[[[-1 for _ in range(2)] for __ in range(1000)] for ___ in range(2)] for ____ in range(2)] for _____ in range(maxd)]
-
-def dfs(num, depth, is_leadingZero, is_limit, dpdata):
-    if depth == len(num):
-        return dpdata.dfsReturn(is_leadingZero)
-    
-    maxdigit = DpData.base - 1 if is_limit else int(num[depth])
-    
-    ans = dp[depth][is_leadingZero][is_limit][dpdata.data0][dpdata.data1]
-    if ans != -1:
-        return ans
-    
-    ans = 0
-    for i in range(0, maxdigit + 1):
-        ans += dfs(
-            num,
-            depth + 1,
-            is_leadingZero and (i == 0),
-            is_limit or (i < maxdigit),
-            dpdata.getNextDpData(is_leadingZero, i)
+        # 3、修改点，数据的初始化，确定 data0 和 data1 表示的是什么
+        self.data = (
+            0,       # 已经枚举的数位 mod 1000 的值
+            False,   # 是否满足条件？
         )
     
-    dp[depth][is_leadingZero][is_limit][dpdata.data0][dpdata.data1] = ans
-    return ans
+    # 4、修改点，修改点，dfs 返回值
+    def dfsReturn(self, is_leadingZero):
+        if is_leadingZero:
+            return 0
+        return 1 if self.data[1] else 0
+    
+    # 5、修改点，状态转移的过程
+    def getNextDpData(self, is_leadingZero, digit):
+        ret = DpData()
+        if is_leadingZero:
+            ret.data = (
+                digit,
+                self.data[1]
+            )
+        else:
+            ret.data = (
+                (self.data[0] * DpData.base + digit) % 1000,
+                self.data[1] \
+                or (self.data[0] == 202 and digit == 3) \
+                or (self.data[0]%10 == 1 and digit == 4),
+            )
+        return ret
+
+    # 6、修改点，剪枝，判断是否可以继续枚举
+    def isInvalid(self, depth, maxdepth):
+        return False
+
 
 # 固定模板，不需要修改，求 [0, n] 中所有满足条件的数的数量
-def getans(n):
-    # 重置dp数组
-    for i in range(maxd):
-        for j in range(2):
-            for k in range(2):
-                for l in range(1000):
-                    for m in range(2):
-                        dp[i][j][k][l][m] = -1
-    
-    a = []
-    s = []
-    
-    if n == 0:
-        a.append(0)
-    else:
-        while n:
-            a.append(n % DpData.base)
-            n //= DpData.base
-    
-    for i in range(len(a)-1, -1, -1):
-        s.append(str(a[i]))
-    
+def DigitDP_GetAns(n):
+
+    digits = []
+    while n:
+        digits.append(n % DpData.base)
+        n //= DpData.base
+    digits = digits[::-1] if digits else [0]
+    dlen = len(digits)
     dpd = DpData()
-    return dfs(s, 0, True, False, dpd)
+    DpData.dp = {}
+
+    def digitDP_dfs(
+            depth,                  # 当前枚举到的是第几个数位
+            is_leadingZero,         # 为 1 时，代表前面枚举的都是0；默认为 1
+            is_limit,               # 为 1 时，代表前面数位已经 < num 的高位；默认为 0
+            dpdata                  # 数位DP用到的核心数据结构
+        ):
+        if depth == dlen:
+            return dpdata.dfsReturn(is_leadingZero)
+        
+        if dpdata.isInvalid(depth, dlen):
+            return 0
+        
+        maxdigit = (DpData.base - 1) if is_limit else digits[depth]
+        dpstate = (depth, is_leadingZero, is_limit, dpdata.data)
+        ans = DpData.dp.get(dpstate, None)
+        if ans:
+            return ans
+        ans = 0
+        for i in range(0, maxdigit + 1):
+            ans += digitDP_dfs(
+                depth + 1,
+                is_leadingZero and (i == 0),
+                is_limit or (i < maxdigit),
+                dpdata.getNextDpData(is_leadingZero, i)
+            )
+        DpData.dp[dpstate] = ans
+        return ans
+    
+    return digitDP_dfs( 0, True, False, dpd)
 
 # 固定模板，数位DP的差分操作，求 [l, r] 中所有满足条件的数的个数
-def getans_range(l, r):
-    return getans(r) - getans(l-1)
+def DigitDP_GetRange(l, r):
+    return DigitDP_GetAns(r) - DigitDP_GetAns(l-1)
+##########################################数位DP模板##########################################
 
 # 主逻辑
 l, r = map(int, input().split())
-print(getans_range(l, r))
+print(DigitDP_GetRange(l, r))
