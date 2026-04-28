@@ -1,112 +1,74 @@
 import math
 
-# 状压DP - 哈密尔顿路模板
-
-# 1、第一步：确定 maxn 的大小
+############################状压DP模板(哈密尔顿路)############################
 maxn = 16
-# 2、第二步：确定 type 的类型
-type = float
-# 3、第三步：确定 dptype 类型
-dptype = 0  # 0: MIN, 1: MAX, 2: NUM
+inf = 1000000000
+init = 0
 
-# 4、第四步：实现任意两点间距离函数：dis_func
-# 5、第五步：调用 HamiltonDP_Solve
-
-# dp[i][j] etc, i = 1101, j = 2
-# 代表已经访问了0、2、3三个顶点，且上一个顶点是2的最优解
-dp = [[-1 for _ in range(maxn)] for _ in range(1 << maxn)]
+# dp[i][j] 代表已经访问了0、2、3三个顶点，且上一个顶点是2的最优解
+dp = []
 # dis[i][j] 代表从 i->j 的距离
 dis = [[0.0 for _ in range(maxn)] for _ in range(maxn)]
 
-# 固定模板
-def HamiltonDP_opt(a, b, c):
-    if dptype == 0:  # MIN
-        return min(a, b + c)
-    elif dptype == 1:  # MAX
-        return max(a, b + c)
-    elif dptype == 2:  # NUM
-        return a + b * c
-
-# 固定模板，如果类型不是 long long基本不需要修改
-def HamiltonDP_ValueInf():
-    if dptype == 0:  # MIN
-        return 1000000000.0
-    elif dptype == 1:  # MAX
-        return -1000000000.0
-    elif dptype == 2:  # NUM
-        return 0
-
-# 固定模板
-def HamiltonDP_ValueInit():
-    if dptype == 0:  # MIN
-        return 0.0
-    elif dptype == 1:  # MAX
-        return 0.0
-    elif dptype == 2:  # NUM
-        return 1
+# 需要根据实际题目进行修改，有可能是最小值，最大值 或者方案数
+def HamiltonDP_opt(curVal, start2i, i2end):
+    return min(curVal, start2i + i2end)
 
 # 固定模板，计算任意两点间的距离
-# dis_func 是需要根据实际情况
-def HamiltonDP_initEdges(n, df):
+def hamiltonDP_initEdges(n, df):
     for i in range(n):
         for j in range(n):
             dis[i][j] = df(i, j)
 
-# 固定模板，初始化所有状态
-# 顶点编号是 [0, n)
-def HamiltonDP_Init(n, df):
-    for i in range(1 << n):
-        for j in range(n):
-            dp[i][j] = -1
-    HamiltonDP_initEdges(n, df)
+# 固定模板，初始化所有状态，顶点编号是 [0, n)
+def hamiltonDP_Init(n, df):
+    for _ in range(1 << n):
+        dp.append([-1.0 for _ in range(n)])
+    hamiltonDP_initEdges(n, df)
 
 # 固定模板，大部分情况不需要修改
 # state ：二进制的1101 代表 0、2、3 三个顶点已经被访问
 #     n ：总共多少个顶点
-#   pre ：路径上的上一个顶点
-def HamiltonDP_Dfs(state, n, isCircle, start, pre):
-    if state + 1 == (1 << n):
-        init = HamiltonDP_ValueInit()
-        inf = HamiltonDP_ValueInf()
-        if isCircle:
-            return HamiltonDP_opt(inf, init, dis[pre][start])
+# start : 路径上的起点顶点
+#   end ：路径上的终点顶点
+def hamiltonDP_Dfs(state, n, start, end):
+    if start == end and state == 0:
         return init
-    ans = dp[state][pre]
-    if ans >= 0:
-        return ans
-    ans = HamiltonDP_ValueInf()
+    if dp[state][end] >= 0:
+        return dp[state][end]
+    
+    ans = inf
     for i in range(n):
-        if state & (1 << i):
+        if (state & (1 << i)) == 0:
             continue
-        d = dis[pre][i]
-        next_val = HamiltonDP_Dfs(state | (1 << i), n, isCircle, start, i)
-        ans = HamiltonDP_opt(ans, d, next_val)
-    dp[state][pre] = ans
+        if (state & (1 << end)) == 0:
+            continue
+        # start -> ... -> i -> end 为一条路径
+        start2i = hamiltonDP_Dfs(state ^ (1 << end), n, start, i)
+        i2end = dis[i][end]
+        ans = HamiltonDP_opt(ans, start2i, i2end)
+    
+    dp[state][end] = ans
     return ans
 
-def HamiltonDP_Solve(df, n, isCircle, start=-1):
-    HamiltonDP_Init(n, df)
-    ans = HamiltonDP_ValueInf()
-    ini = HamiltonDP_ValueInit()
-    if start == -1:
-        for i in range(n):
-            v = HamiltonDP_Dfs(1 << i, n, isCircle, i, i)
-            ans = HamiltonDP_opt(ans, v, ini)
-    else:
-        v = HamiltonDP_Dfs(1 << start, n, isCircle, start, start)
-        ans = HamiltonDP_opt(ans, v, ini)
-    return ans
+# 固定模板，大部分情况不需要修改
+# 求从 start 到 所有的 end 路径上的最优值
+def HamiltonDP_Solve(df, n, start):
+    hamiltonDP_Init(n, df)
+    ret = inf
+    for end in range(n):
+        ans = hamiltonDP_Dfs((1 << n) - 1, n, start, end)
+        ret = HamiltonDP_opt(ret, init, ans)
+    return ret
 
-# 具体问题实现
-n = int(input())
-n += 1
-x = [0] * maxn
-y = [0] * maxn
-x[0] = y[0] = 0
+############################状压DP模板(哈密尔顿路)############################
+
+n = int(input()) + 1
+x, y = [0], [0]
 for i in range(1, n):
     xi, yi = map(int, input().split())
-    x[i] = xi
-    y[i] = yi
+    x.append(xi)
+    y.append(yi)
 
 def d(a, b):
     return math.sqrt(
@@ -114,5 +76,5 @@ def d(a, b):
         + (y[a] - y[b]) * (y[a] - y[b])
     )
 
-result = HamiltonDP_Solve(d, n, False, 0)
+result = HamiltonDP_Solve(d, n, 0)
 print("%.2f" % result)
