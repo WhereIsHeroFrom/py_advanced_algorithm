@@ -94,6 +94,6 @@ def DigitDP_GetRange(l, r):
     return DigitDP_GetAns(r) - DigitDP_GetAns(l-1)
 ##########################################数位DP模板##########################################
 
-# 主逻辑
+
 l, r = map(int, input().split())
 print(DigitDP_GetRange(l, r))
